@@ -50,7 +50,7 @@ d3.json("log.json",function(err,data) {
   var circle = svg.append("g").selectAll("circle")
       .data(nodes)
     .enter().append("circle")
-      .attr("r", 6)
+      .attr("r", 6.5)
       .call(force.drag)
       .attr("id",function(d) { return "_"+d.key.replace(".","-"); })
       .attr("class",function(d) { return Object.keys(d.connections).map(function(e) { return "_"+e.replace(".","-"); }).join(" "); })
@@ -70,9 +70,15 @@ d3.json("log.json",function(err,data) {
     svg.selectAll("path,circle")
       .style("opacity",function() {return (d) ? 0.6 : 1; })
       .style("stroke",null)
-      .style("fill",null);
-    d3.selectAll("circle"+d).style("fill","red").style("opacity",1);
-    d3.selectAll("path"+d).style("stroke","red").style("opacity",1);
+      .style("fill",null)
+      .style("stroke-width",null);
+    d3.selectAll("circle"+d)
+      .style("fill","red")
+      .style("opacity",1);
+    d3.selectAll("path"+d)
+      .style("stroke","red")
+      .style("opacity",1)
+      .style("stroke-width","2px");
   }
       
   // Use elliptical arc path segments to doubly-encode directionality.
