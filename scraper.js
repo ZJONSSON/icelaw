@@ -2,6 +2,7 @@
 "use strict";
 
 var request = require("request"),
+    iconv = require("iconv-lite"),
     fs = require("fs");
 
 var rePages = /a href=\"http:\/\/www.althingi.is\/lagas\/141a\/(.*)?\.html\"/g,
@@ -21,8 +22,9 @@ function openPages() {
       i = keys.length;
 
   keys.forEach(function(page) {
-    request({url:"http://www.althingi.is/lagas/141a/"+page+".html",encoding:'utf-8'},function(error,response,body) {
+    request({url:"http://www.althingi.is/lagas/141a/"+page+".html",encoding:null},function(error,response,body) {
       var link,title;
+      body = iconv.decode(body,'iso-8859-1');
       title = reTitle.exec(body);
       if (title) pages[page].title = title[1];
       pages[page].size = body.length;
