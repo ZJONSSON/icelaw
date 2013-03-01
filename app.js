@@ -15,7 +15,7 @@ d3.json("log.json",function(err,data) {
       var source = node,
           target = data[link];
       if (!target) return;
-      links.push({type:"suit",source:source,target:target || l});
+      links.push({source:source,target:target});
       source.connections = source.connections || {};
       target.connections = target.connections || {};
       source.connections[link] = 1;
@@ -43,12 +43,12 @@ d3.json("log.json",function(err,data) {
       });
 
   var path = svg.append("g").selectAll("path")
-      .data(force.links())
+      .data(links)
     .enter().append("path")
       .attr("class", function(d) { return "link " + d.type+" _"+d.target.key.replace(".","-")+" _"+d.source.key.replace(".",","); });
 
   var circle = svg.append("g").selectAll("circle")
-      .data(force.nodes())
+      .data(nodes)
     .enter().append("circle")
       .attr("r", 6)
       .call(force.drag)
@@ -76,6 +76,7 @@ d3.json("log.json",function(err,data) {
   }
       
   // Use elliptical arc path segments to doubly-encode directionality.
+  // source: https://gist.github.com/mbostock/1153292
   function tick() {
     force.nodes().forEach(function(node) {
       node.x = Math.max(m,Math.min(container.offsetWidth-m,node.x));
