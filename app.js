@@ -45,17 +45,17 @@ d3.json("log.json",function(err,data) {
   var path = svg.append("g").selectAll("path")
       .data(force.links())
     .enter().append("path")
-      .attr("class", function(d) { return "link " + d.type+" _"+d.target.key+" _"+d.source.key; });
+      .attr("class", function(d) { return "link " + d.type+" _"+d.target.key.replace(".","-")+" _"+d.source.key.replace(".",","); });
 
   var circle = svg.append("g").selectAll("circle")
       .data(force.nodes())
     .enter().append("circle")
       .attr("r", 6)
       .call(force.drag)
-      .attr("id",function(d) { return "_"+d.key; })
-      .attr("class",function(d) { return Object.keys(d.connections).map(function(e) { return "_"+e; }).join(" "); })
-      .on("click",function() {
-        selected("."+d3.select(this).attr("id").replace(".",""));
+      .attr("id",function(d) { return "_"+d.key.replace(".","-"); })
+      .attr("class",function(d) { return Object.keys(d.connections).map(function(e) { return "_"+e.replace(".","-"); }).join(" "); })
+      .on("click",function(d) {
+        selected("._"+d.key.replace(".","-"));
         if (d3.event) d3.event.stopPropagation();
       })
       .on("dblclick",function(d) {
@@ -93,10 +93,10 @@ d3.json("log.json",function(err,data) {
     });
   }
 
-function resize() {
-    force.size([container.offsetWidth, container.offsetHeight]).start();
-}
-d3.select(window).on("resize",resize);
-resize();
+  function resize() {
+      force.size([container.offsetWidth, container.offsetHeight]).start();
+  }
+  d3.select(window).on("resize",resize);
+  resize();
 
 });
