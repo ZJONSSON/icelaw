@@ -63,7 +63,7 @@ d3.json("log.json",function(err,data) {
       })
       .call(function(g) {
         g.append("title")
-        .text(function(d) { return d.title; });
+        .text(function(d) { return d.title+" ("+d.key.slice(0,4)+"-"+d.key.slice(4)+")" });
       });
       
   function selected(d) {
