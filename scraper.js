@@ -5,6 +5,9 @@ var request = require("request"),
     iconv = require("iconv-lite"),
     fs = require("fs");
 
+// Set maxSocets to Infinity to rudely open up all requests at same time
+// require("http").globalAgent.maxSockets = Infinity;
+
 var rePages = /a href=\"http:\/\/www.althingi.is\/lagas\/141a\/(.*)?\.html\"/g,
     reLinks = /a href=\"([^\/]*)\.html?\">/g,
     reTitle = /<title>.*\/(.*)?<\/title>/;
