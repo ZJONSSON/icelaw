@@ -1,32 +1,30 @@
 /*global d3,container,window*/
 var m = 15,   // Margin
-    links = [];
+    links = [],
+    target;
 
 d3.json("log.json",function(err,data) {
 
   // Change nodes to an array
   var nodes = Object.keys(data).map(function(key) {
     data[key].key = key;
+    data[key].refs = {};
     return data[key];
   });
 
   nodes.forEach(function(node) {
     Object.keys(node.links).forEach(function(link) {
-      var source = node,
-          target = data[link];
-      if (!target) return;
-      links.push({source:source,target:target});
-      source.connections = source.connections || {};
-      target.connections = target.connections || {};
-      source.connections[link] = 1;
-      target.connections[link] = 1;
-      source.connections[node.key] = 1;
-      target.connections[node.key] = 1; 
+      if (target = data[link]) {
+        links.push({source:node,target:target});
+        target.refs[node.key] = true;
+      };
     });
   });
 
   // Remove nodes with no connections
-  nodes = nodes.filter(function(d) { return d.connections; });
+  nodes = nodes.filter(function(d) {
+    return Object.keys(d.refs).length+Object.keys(d.links).length; 
+  });
 
   var force = d3.layout.force()
       .nodes(nodes)
@@ -34,28 +32,35 @@ d3.json("log.json",function(err,data) {
       .linkDistance(60)
       .friction(0.5)
       .charge(-150)
-      .on("tick", tick)
-      .size([container.offsetWidth, container.offsetHeight]);
+      .on("tick", tick);
     
   var svg = d3.select("svg")
       .on("click",function() {
-        selected(null);
+        d3.selectAll("circle,path")
+        .attr("class","");
       });
 
   var path = svg.append("g").selectAll("path")
       .data(links)
-    .enter().append("path")
-      .attr("class", function(d) { return "link " + d.type+" _"+d.target.key.replace(".","-")+" _"+d.source.key.replace(".",","); });
-
+    .enter().append("path");
+      
+     
   var circle = svg.append("g").selectAll("circle")
       .data(nodes)
     .enter().append("circle")
       .attr("r", 6.5)
       .call(force.drag)
-      .attr("id",function(d) { return "_"+d.key.replace(".","-"); })
-      .attr("class",function(d) { return Object.keys(d.connections).map(function(e) { return "_"+e.replace(".","-"); }).join(" "); })
       .on("click",function(d) {
-        selected("._"+d.key.replace(".","-"));
+        var clicked = this;
+        svg.selectAll("circle,path")
+          .attr("class",function(e) {
+            if (!e) return;
+            if (this==clicked) return "selected";
+            if (e.key in d.links || e.source && e.source.key == d.key) return "link from";
+            if (e.key in d.refs || e.target && e.target.key == d.key) return "link to";
+            return "notselected";
+          });
+          
         if (d3.event) d3.event.stopPropagation();
       })
       .on("dblclick",function(d) {
@@ -63,23 +68,8 @@ d3.json("log.json",function(err,data) {
       })
       .call(function(g) {
         g.append("title")
-        .text(function(d) { return d.title+" ("+d.key.slice(0,4)+"-"+d.key.slice(4)+")" });
+        .text(function(d) { return d.title+" ("+d.key.slice(0,4)+"-"+d.key.slice(4)+")"; });
       });
-      
-  function selected(d) {
-    svg.selectAll("path,circle")
-      .style("opacity",function() {return (d) ? 0.6 : 1; })
-      .style("stroke",null)
-      .style("fill",null)
-      .style("stroke-width",null);
-    d3.selectAll("circle"+d)
-      .style("fill","red")
-      .style("opacity",1);
-    d3.selectAll("path"+d)
-      .style("stroke","red")
-      .style("opacity",1)
-      .style("stroke-width","2px");
-  }
       
   // Use elliptical arc path segments to doubly-encode directionality.
   // source: https://gist.github.com/mbostock/1153292

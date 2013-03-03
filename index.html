@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 <title>Icelaw</title>
 <style>
-path.link {
+path {
   fill: none;
   stroke: #666;
   stroke-width: 0.5px;
@@ -12,6 +12,23 @@ circle {
   fill: #ccc;
   stroke: #333;
   stroke-width: 1.5px;
+}
+
+circle.selected {
+  fill: yellow;
+}
+
+circle.link {
+  fill: red;
+}
+
+path.link  {
+  stroke:red;
+  stroke-width:1.8px;
+}
+
+.notselected {
+  opacity : 0.5;
 }
 
 html, body, div,svg {
