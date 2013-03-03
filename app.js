@@ -17,7 +17,7 @@ d3.json("log.json",function(err,data) {
       if (target = data[link]) {
         links.push({source:node,target:target});
         target.refs[node.key] = true;
-      };
+      }
     });
   });
 
@@ -37,7 +37,8 @@ d3.json("log.json",function(err,data) {
   var svg = d3.select("svg")
       .on("click",function() {
         d3.selectAll("circle,path")
-        .attr("class","");
+        .attr("class","")
+        .attr("marker-end","");
       });
 
   var path = svg.append("g").selectAll("path")
@@ -59,6 +60,9 @@ d3.json("log.json",function(err,data) {
             if (e.key in d.links || e.source && e.source.key == d.key) return "link from";
             if (e.key in d.refs || e.target && e.target.key == d.key) return "link to";
             return "notselected";
+          })
+          .attr("marker-end", function(e) {
+            return e && e.target && (e.target.key == d.key || e.source.key == d.key) && "url(#Triangle)";
           });
           
         if (d3.event) d3.event.stopPropagation();
