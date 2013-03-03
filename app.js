@@ -14,9 +14,11 @@ d3.json("log.json",function(err,data) {
 
   nodes.forEach(function(node) {
     Object.keys(node.links).forEach(function(link) {
-      if (target = data[link]) {
+      if ((target = data[link]) && node !=target) {
         links.push({source:node,target:target});
         target.refs[node.key] = true;
+      } else {
+        delete node.links[link];  // Remove orphan links and self-references
       }
     });
   });
